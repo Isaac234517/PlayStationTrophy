@@ -1,1 +1,26 @@
 name: Update Play Station Tropy gist
+on:
+  schedule:
+    - cron:"0 23 * * *"
+  workflow_dispatch:
+  jobs:
+    update-gist:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v4
+        - name: Install Python
+          uses: action/setup-python@v4
+          with:
+            python-version: '3.9'
+        - name: Install Dependencies
+          shell: bash
+          run: pip install -r requirement.txt
+        - name: Update gist
+          shell: bash
+          run:  python src/main.py
+          env:
+            PSN_NPSSO: ${{secrets.PSN_NPSSO}}
+            GH_TOKEN: ${{secrets.GH_TOKEN}}
+            GIST_ID:  ${{secrets.GIST_ID}}
+
+

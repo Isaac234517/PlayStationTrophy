@@ -6,7 +6,6 @@ from PSNetwork import PSN
 #End 
 NPSSO = os.getenv('PSN_NPSSO')
 GITHUB_TOKEN = os.getenv('GH_TOKEN')
-GH_REPO = os.getenv('GH_REPO')
 GIST_ID = os.getenv('GIST_ID')
 
 
