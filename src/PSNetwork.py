@@ -2,7 +2,7 @@ import requests
 from HttpRequester import HttpRequester
 class PSN:
 
-    def _init__(self, npsso:str=None, access_token:str = None, refresh_token:str = None, language_str = 'en-US'):
+    def __init__(self, npsso:str=None, access_token:str = None, refresh_token:str = None, language_str = 'en-US'):
         self.npsso = npsso
         self.access_token = access_token
         self.refresh_token = refresh_token
@@ -20,7 +20,7 @@ class PSN:
             'fields': 'npId,onlineId,accountId,avatarUrls,plus'
         }    
 
-        base_addr = self.get_base_address('userProfile')
+        base_addr = self.get_base_address('userProfile/')
         requseter = HttpRequester(base_addr, False)
         header = self.compose_header({})
         resp = requseter.get('userProfile/v1/users/me/profile2', params = params, header= header)
@@ -49,7 +49,7 @@ class PSN:
 
         header = self.compose_header(header)
 
-        base_addr = self.get_base_address('oauth')
+        base_addr = self.get_base_address('oauth/')
         requseter = HttpRequester(base_addr, False)
         resp = requseter.post('oauth/token', params,header)
         if resp.status_code != 200:
@@ -69,11 +69,11 @@ class PSN:
             'scope': 'psn:mobile.v2.core psn:clientapp',
         }
         cookie = {'npsso': self.npsso}
-        base_addr = self.get_base_address('oauth')
+        base_addr = self.get_base_address('oauth/')
         header = self.compose_header({})
         requester = HttpRequester(base_addr, False)
-        resp = requester.get('oauth/authorize', params = params, header = header, allow_redirects = False)
-        if(resp.status_code != 200):
+        resp = requester.get('oauth/authorize', params = params, header = header, cookie = cookie, allow_redirects = False)
+        if(resp.status_code != 302):
             raise Exception('You should get the npsso from https://ca.account.sony.com/api/v1/ssocookie')
         code = resp.headers['Location'].split('code=')[1].split('&')[0]
 
@@ -89,20 +89,21 @@ class PSN:
             'Content-Type': 'application/x-www-form-urlencoded',
         })
 
-        resp = requester.post('oauth/token', params = data, hearder=header)
+        resp = requester.post('oauth/token', params = data, header=header)
         if resp.status_code != 200:
             raise Exception("Fail to get Token")
         record = resp.json()
         return record['access_token'], record['refresh_token']
 
     def game_list(self, offset=0, limit=200):
-        base_addr = self.get_base_address('game')
+        base_addr = self.get_base_address('game/')
         requester = HttpRequester(base_addr, False)
         params = {
             'limit': limit,
             'offset': offset
         }
-        resp = requester.get('gamelist/v2/users/me/titles', params = params)
+        header = self.compose_header({})
+        resp = requester.get('gamelist/v2/users/me/titles', params = params, header = header)
         if(resp.status_code != 200):
             return None
         record = resp.json()
@@ -113,17 +114,19 @@ class PSN:
         return games
     
     def trophy_list(self, offset=0, limit=500):
-        base_addr = self.get_base_address('trophy')
+        base_addr = self.get_base_address('trophy/')
         params = {
             'limit':limit,
             'offset': offset,
             'accountId': 'me'
         }
+        header = self.compose_header({})
         requester = HttpRequester(base_addr, False)
-        resp = requester.get('trophy/v1/users/me/trophyTitles', params = params)
+        resp = requester.get('trophy/v1/users/me/trophyTitles', params = params, header = header)
         if(resp.status_code != 200):
             return None
         record =resp.json()
+        print(record)
         trophies = resp['trophyTitles']
         next_offset = resp['nextOffset']
         if(next_offset):
@@ -135,10 +138,10 @@ class PSN:
             'accountId': 'me',
             'npTitleIds': game_id
         }
-
-        base_addr = self.get_base_address('trophy')
+        header = self.compose_header({})
+        base_addr = self.get_base_address('trophy/')
         requester = HttpRequester(base_addr, False)
-        resp = requester.get('trophy/v1/users/me/titles/trophyTitles', params = params)
+        resp = requester.get('trophy/v1/users/me/titles/trophyTitles', params = params, header = header)
         if(resp.status_code != 200):
             return None
         record = resp.json()
@@ -147,17 +150,8 @@ class PSN:
                 return title['trophyTitles'][0]
         return None
 
-
-    # def get_endpoint(self,api) 
-    #     if api.startswitch('oauth/'):
-    #         return f'{self.auth_endpoint}{api}'        
-    #     elif api.startswith('userProfile/'):
-    #         return f'{self.profile_endpoint}{api}'
-    #     else:
-    #         return f'{self.api_endpoint}{api}'
-
     def get_base_address(self, api) -> str:
-        if api.startswitch('oauth/'):
+        if api.startswith('oauth/'):
             return self.auth_endpoint    
         elif api.startswith('userProfile/'):
             return self.profile_endpoint
@@ -174,3 +168,28 @@ class PSN:
         if not 'User-Agent' in header:
             header['User-Agent'] = 'PlayStation/21090100 CFNetwork/1126 Darwin/19.5.0'
         return header
+    
+    @classmethod
+    def convert_play_duration(cls,playtime_str:str):
+        playtime_str = playtime_str.replace('PT','')
+        playtime_str = playtime_str.replace('H', 'hrs')
+        playtime_str = playtime_str.replace('M', 'mins')
+        playtime_str = playtime_str.replace('S', 'secs')
+
+        if('hrs' not in playtime_str):
+            return '0 Hours'
+        else:
+            return f'{playtime_str.split('hrs')[0]} Hours'
+    
+    @classmethod
+    def get_duration_in_hours(cls,playtime_str:str):
+        playtime_str = playtime_str.replace('PT','')
+        playtime_str = playtime_str.replace('H', 'hrs')
+        playtime_str = playtime_str.replace('M', 'mins')
+        playtime_str = playtime_str.replace('S', 'secs')
+
+        if('hrs' not in playtime_str):
+            return 0
+        else:
+            return int(playtime_str.split('hrs')[0])
+
