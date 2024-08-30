@@ -126,7 +126,6 @@ class PSN:
         if(resp.status_code != 200):
             return None
         record =resp.json()
-        print(record)
         trophies = resp['trophyTitles']
         next_offset = resp['nextOffset']
         if(next_offset):

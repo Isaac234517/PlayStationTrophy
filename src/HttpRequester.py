@@ -16,3 +16,8 @@ class HttpRequester:
         endpoint = f'{self.base_address}{api}'
         resp = requests.post(endpoint, data = params,headers= header)
         return resp
+    
+    def patch(self, api, params:dict, header:dict = None) -> Response:
+        endpoint = f'{self.base_address}{api}'
+        resp = requests.patch(endpoint, headers= header, json = params)
+        return resp
