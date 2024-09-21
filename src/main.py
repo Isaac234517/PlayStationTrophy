@@ -6,7 +6,7 @@ import utils
 # load_dotenv()
 #End 
 NPSSO = os.getenv('PSN_NPSSO')
-GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')
+GITHUB_TOKEN = os.getenv('GIT_TOKEN')
 GIST_ID = os.getenv('GIST_ID')
 
 
