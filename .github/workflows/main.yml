@@ -20,7 +20,7 @@ jobs:
           run:  python src/main.py
           env:
             PSN_NPSSO: ${{secrets.PSN_NPSSO}}
-            GH_TOKEN: ${{secrets.GH_TOKEN}}
+            GIT_TOKEN: ${{secrets.GIT_TOKEN}}
             GIST_ID:  ${{secrets.GIST_ID}}
 
 
