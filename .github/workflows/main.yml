@@ -1,9 +1,9 @@
 name: Update Play Station Tropy gist
 on:
   schedule:
-    - cron:"0 23 * * *"
+    - cron:"*/5 * * * *"
   workflow_dispatch:
-  jobs:
+jobs:
     update-gist:
       runs-on: ubuntu-latest
       steps:
