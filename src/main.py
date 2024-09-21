@@ -2,8 +2,8 @@ import os
 from PSNetwork import PSN
 import utils
 #For local test
-from dotenv import load_dotenv
-load_dotenv()
+# from dotenv import load_dotenv
+# load_dotenv()
 #End 
 NPSSO = os.getenv('PSN_NPSSO')
 GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')
@@ -56,7 +56,7 @@ if __name__ == '__main__':
             f'{truncate_name}{" "*padding}',
             record['play_duration'].ljust(11),
             utils.generate_progress_bar(record['progress'], 8),
-            f'{record['progress']:.2f}%'.rjust(6)
+            f'{record["progress"]:.2f}%'.rjust(6)
         ]
         content += ' '.join(line)+'\n'
     try:

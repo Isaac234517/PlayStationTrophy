@@ -178,7 +178,7 @@ class PSN:
         if('hrs' not in playtime_str):
             return '0 Hours'
         else:
-            return f'{playtime_str.split('hrs')[0]} Hours'
+            return f'{playtime_str.split("hrs")[0]} Hours'
     
     @classmethod
     def get_duration_in_hours(cls,playtime_str:str):
