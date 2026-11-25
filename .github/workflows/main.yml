@@ -1,7 +1,7 @@
 name: Update Play Station Tropy gist
 on:
   schedule:
-    - cron: "0 0 * * *"
+    - cron: "0 0 * * 1"
   workflow_dispatch:
 jobs:
     update-gist:
@@ -11,7 +11,7 @@ jobs:
         - name: Install Python
           uses: actions/setup-python@v6
           with:
-            python-version: '3.14.4'
+            python-version: '3.16.0'
         - name: Install Dependencies
           shell: bash
           run: pip install -r requirement.txt
